@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const readline = require('readline');
 
-function help() {
+function help(moves) {
     console.log(`
         Welcome to the Generalized Rock-Paper-Scissors game!
 
@@ -17,20 +17,41 @@ function help() {
         * Each move competes against half of the following moves in a circular order.
         * The goal is to choose a move that beats the computer's move.
         * If you choose the same move as the computer, it's a tie!
-
-        Move Outcomes Table:
-
-             |  Rock   |  Paper  | Scissors |  Lizard |  Spock
-        --------------------------------------------------------
-        Rock |   Tie   |  Lose   |   Win    |   Win   |  Lose
-        Paper|   Win   |   Tie   |   Lose   |   Lose  |  Win
-        Scissors| Lose  |   Win   |   Tie    |   Win   |  Lose
-        Lizard|  Lose  |   Win   |   Lose   |   Tie   |  Win
-        Spock |  Win   |   Lose  |   Win    |   Lose  |  Tie
-
-        Good luck!
     `);
+    generateOutcomesTable(moves)
     process.exit(0);
+}
+
+function generateOutcomesTable(moves) {
+    const outcomes = {};
+    const numMoves = moves.length;
+    const halfMoves = Math.floor(numMoves / 2);
+
+    moves.forEach((move, i) => {
+        outcomes[move] = {};
+        moves.forEach((opponent, j) => {
+            if (i === j) {
+                outcomes[move][opponent] = 'Tie';
+            } else if ((j - i + numMoves) % numMoves <= halfMoves) {
+                outcomes[move][opponent] = 'Lose';
+            } else {
+                outcomes[move][opponent] = 'Win';
+            }
+        });
+    });
+
+    const table = [];
+    moves.forEach((move) => {
+        const row = [move];
+        moves.forEach((opponent) => {
+            row.push(outcomes[move][opponent]);
+        });
+        table.push(row);
+    });
+
+    const headers = ['⬇️ You / Computer ➡️', ...moves];
+    console.log("Move Outcomes Table:");
+    console.table([headers, ...table.map(row => [row[0], ...row.slice(1)])]);
 }
 
 function exit() {
@@ -74,7 +95,7 @@ async function userMove(moves) {
         });
 
         if (userChoice === '?') {
-            help();
+            help(moves);
         } else if (!isNaN(userChoice)) {
             const choiceIndex = parseInt(userChoice, 10);
             if (choiceIndex === 0) {

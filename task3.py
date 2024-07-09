@@ -7,10 +7,10 @@ from collections import OrderedDict
 from tabulate import tabulate
 
 
-def help():
+def help(moves):
     """Prints the game rules to the console."""
     print(
-        """Welcome to the Generalized Rock-Paper-Scissors game!
+        """Welcome to the Rock-Paper-Scissors game!
 
 Here are the rules:
 
@@ -26,7 +26,7 @@ Here are the rules:
 * If you choose the same move as the computer, it's a tie!
 """
     )
-    generate_outcomes_table()
+    generate_outcomes_table(moves)
     exit()
 
 
@@ -34,45 +34,20 @@ def exit():
     sys.exit(0)
 
 
-def generate_outcomes_table():
-    moves = ["Rock", "Paper", "Scissors", "Lizard", "Spock"]
-    outcomes = {
-        "Rock": {
-            "Rock": "Tie",
-            "Paper": "Lose",
-            "Scissors": "Win",
-            "Lizard": "Win",
-            "Spock": "Lose",
-        },
-        "Paper": {
-            "Rock": "Win",
-            "Paper": "Tie",
-            "Scissors": "Lose",
-            "Lizard": "Lose",
-            "Spock": "Win",
-        },
-        "Scissors": {
-            "Rock": "Lose",
-            "Paper": "Win",
-            "Scissors": "Tie",
-            "Lizard": "Win",
-            "Spock": "Lose",
-        },
-        "Lizard": {
-            "Rock": "Lose",
-            "Paper": "Win",
-            "Scissors": "Lose",
-            "Lizard": "Tie",
-            "Spock": "Win",
-        },
-        "Spock": {
-            "Rock": "Win",
-            "Paper": "Lose",
-            "Scissors": "Win",
-            "Lizard": "Lose",
-            "Spock": "Tie",
-        },
-    }
+def generate_outcomes_table(moves):
+    outcomes = {}
+    num_moves = len(moves)
+    half_moves = num_moves // 2
+
+    for i, move in enumerate(moves):
+        outcomes[move] = {}
+        for j, opponent in enumerate(moves):
+            if i == j:
+                outcomes[move][opponent] = "Tie"
+            elif (j - i) % num_moves <= half_moves:
+                outcomes[move][opponent] = "Lose"
+            else:
+                outcomes[move][opponent] = "Win"
 
     table = []
     for move in moves:
@@ -116,7 +91,7 @@ def user_move(moves):
         user_choice = input("Enter your move: ")
 
         if user_choice == "?":
-            help()
+            help(moves)
         elif user_choice.isdigit():
             choice_index = int(user_choice)
             if choice_index == 0:
@@ -139,60 +114,6 @@ def determine_winner(user_move, computer_move, moves):
     if index_user == index_computer:
         print("It's a tie!")
     elif difference == (len(moves) // 2):
-        print("You Win!")
-    else:
-        print("Computer Wins!")
-
-
-def get_winner(user_move, computer_move):
-    """Determine and print the winner of the game."""
-    print(f"Your Move: {user_move}")
-    print(f"Computer Move: {computer_move}")
-
-    # Define move outcomes in a circular order
-    outcomes = {
-        "rock": {
-            "rock": "tie",
-            "paper": "lose",
-            "scissors": "win",
-            "lizard": "win",
-            "spock": "lose",
-        },
-        "paper": {
-            "rock": "win",
-            "paper": "tie",
-            "scissors": "lose",
-            "lizard": "lose",
-            "spock": "win",
-        },
-        "scissors": {
-            "rock": "lose",
-            "paper": "win",
-            "scissors": "tie",
-            "lizard": "win",
-            "spock": "lose",
-        },
-        "lizard": {
-            "rock": "lose",
-            "paper": "win",
-            "scissors": "lose",
-            "lizard": "tie",
-            "spock": "win",
-        },
-        "spock": {
-            "rock": "win",
-            "paper": "lose",
-            "scissors": "win",
-            "lizard": "lose",
-            "spock": "tie",
-        },
-    }
-
-    outcome = outcomes[user_move][computer_move]
-
-    if outcome == "tie":
-        print("It's a tie!")
-    elif outcome == "win":
         print("You Win!")
     else:
         print("Computer Wins!")
@@ -221,32 +142,9 @@ def main():
     print(f"Computer Move: {computer_move_choice}")
 
     # Determine winner
-    # get_winner(user_move_choice, computer_move_choice)
     determine_winner(user_move_choice, computer_move_choice, moves)
     print(f"secret_key: {secret_key}")
 
 
 if __name__ == "__main__":
     main()
-
-
-# python task3.py rock paper scissors
-# ["0"]
-# python task3.py rock paper scissors
-# ["?"]
-# python task3.py rock paper scissors
-# ["1"]
-# python task3.py rock paper scissors
-# ["5"]
-# python task3.py rock paper
-# ["1"]
-# python task3.py rock paper paper scissors
-# ["2"]
-# python task3.py rock paper scissors lizard spock
-# ["3"]
-# python task3.py rock paper scissors lizard spock dragon wizard
-# ["4"]
-# python task3.py alpha beta gamma
-# ["1"]
-# python task3.py 1 2 3 4 5
-# ["2"]
